@@ -5,19 +5,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.litesoft</groupId>
-    <artifactId>background_processing</artifactId>
-    <version>1.0.3</version>
+    <artifactId>single_linked_list</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>background_processing</name>
+    <name>single_linked_list</name>
 
-    <description>Library to support long running Background Processes</description>
-    <url>https://github.com/litesoft-java/BackgroundProcessing</url>
+    <description>FIFO queue (implemented as linked list), with the added support to "push" an entry as the new next (first) node</description>
+    <url>https://github.com/litesoft-java/SingleLinkedList</url>
 
     <licenses>
         <license>
             <name>The Unlicense</name>
-            <url>https://github.com/litesoft-java/BackgroundProcessing/blob/master/LICENSE</url>
+            <url>https://github.com/litesoft-java/SingleLinkedList/blob/master/LICENSE</url>
         </license>
     </licenses>
 
@@ -36,9 +36,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/litesoft-java/BackgroundProcessing.git</connection>
-        <developerConnection>scm:git:ssh://github.com:litesoft-java/BackgroundProcessing.git</developerConnection>
-        <url>https://github.com/litesoft-java/BackgroundProcessing</url>
+        <connection>scm:git:git://github.com/litesoft-java/SingleLinkedList.git</connection>
+        <developerConnection>scm:git:ssh://github.com:litesoft-java/SingleLinkedList.git</developerConnection>
+        <url>https://github.com/litesoft-java/SingleLinkedList</url>
     </scm>
 
     <distributionManagement>
@@ -56,24 +56,10 @@
     </properties>
 
     <dependencies>
-        <!--suppress VulnerableLibrariesLocal -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.28</version>
-            <optional>true</optional>
-        </dependency>
-
         <dependency>
             <groupId>org.litesoft</groupId>
             <artifactId>annotations</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.litesoft</groupId>
-            <artifactId>exceptional_functional_interfaces</artifactId>
-            <version>1.0.0</version>
+            <version>2.2.0</version>
         </dependency>
 
         <!-- Test dependencies -->
