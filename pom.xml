@@ -65,10 +65,11 @@
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.litesoft</groupId>
-            <artifactId>background_processing</artifactId>
-            <version>1.0.3</version>
+            <artifactId>exceptional_functional_interfaces</artifactId>
+            <version>1.0.0</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
