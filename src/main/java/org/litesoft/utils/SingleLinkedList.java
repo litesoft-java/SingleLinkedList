@@ -3,6 +3,8 @@ package org.litesoft.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -71,6 +73,24 @@ public class SingleLinkedList<T> {
     }
 
     /**
+     * Remove all entries (this) that (identity) match from the <code>toRemove</code> list.
+     *
+     * @return Java List (not null) containing all the <code>toRemove</code> entries that did NOT cause a removal.
+     */
+    public final @NotNull List<T> removeAllIdentity( @Nullable List<T> toRemove ) {
+        return process( toRemove, this::lambdaRemoveAllMatching, ( t1, t2 ) -> t1 == t2 );
+    }
+
+    /**
+     * Remove all entries (this) that (equal) match from the <code>toRemove</code> list.
+     *
+     * @return Java List (not null) containing all the <code>toRemove</code> entries that did NOT cause a removal.
+     */
+    public final List<T> removeAllEqual( @Nullable List<T> toRemove ) {
+        return process( toRemove, this::lambdaRemoveAllMatching, Objects::equals );
+    }
+
+    /**
      * Get all the current Entries as a Java List.
      *
      * @return Java List containing all the current Entries (not null), make be an empty List!
@@ -110,6 +130,38 @@ public class SingleLinkedList<T> {
     private Node<T> tail; // defaults to null
     private int size; // defaults to zero
 
+    private Node<T> removeHead( Node<T> seizedHead ) {
+        if ( 0 == --size ) {
+            tail = head = null;
+        } else {
+            head = seizedHead.next;
+        }
+        return seizedHead;
+    }
+
+    private void removeNodeNext( Node<T> keep ) {
+        size--;
+        Node<T> newKeepNext = keep.next = keep.next.next;
+        if ( newKeepNext == null ) { // no 'next' after 'next'
+            tail = keep; // -> 'next' must have been the 'tail'
+        }
+    }
+
+    private boolean removeAll( T entry, BiPredicate<T, T> matcher ) {
+        boolean removed = false;
+        while ( (head != null) && matcher.test( entry, head.entry ) ) {
+            removeHead( head );
+            removed = true;
+        }
+        for ( Node<T> keep = head; keep != null; keep = keep.next ) {
+            for ( Node<T> nn = keep.next; ((nn != null) && matcher.test( entry, nn.entry )); nn = keep.next ) {
+                removeNodeNext( keep );
+                removed = true;
+            }
+        }
+        return removed;
+    }
+
     private Integer lambdaSize() {
         return size;
     }
@@ -119,16 +171,23 @@ public class SingleLinkedList<T> {
     }
 
     private Node<T> lambdaRemove() {
+        return (0 != size) ? removeHead( head ) : null;
+    }
+
+    private List<T> lambdaRemoveAllMatching( List<T> toRemove, BiPredicate<T, T> matcher ) {
+        if ( (toRemove == null) || toRemove.isEmpty() ) {
+            return List.of();
+        }
         if ( 0 == size ) {
-            return null;
+            return toRemove;
         }
-        Node<T> seizedHead = head;
-        if ( 0 == --size ) {
-            tail = head = null;
-        } else {
-            head = seizedHead.next;
+        ArrayList<T> nonMatched = new ArrayList<>();
+        for ( T entry : toRemove ) {
+            if ( !removeAll( entry, matcher ) ) {
+                nonMatched.add( entry );
+            }
         }
-        return seizedHead;
+        return nonMatched;
     }
 
     private void lambdaPrepend( T entry ) {
@@ -209,5 +268,22 @@ public class SingleLinkedList<T> {
      */
     protected <FR> FR process( Supplier<FR> supplier ) {
         return supplier.get();
+    }
+
+    /**
+     * Vectoring <code>ListProcessor</code>> based Lambda processor to provide the option to wrap the execution.
+     *
+     * @param toProcess List to process
+     * @param processor How to Process the list
+     * @param matcher   determines if a toProcess list entry matches an internal list entry.
+     * @param <FR>      @see SingleLinkedList
+     * @return resulting list of <code>FR</code> that relates the passed list to the internal list.
+     */
+    protected <FR> List<FR> process( List<FR> toProcess, ListProcessor<FR> processor, BiPredicate<FR, FR> matcher ) {
+        return processor.process( toProcess, matcher );
+    }
+
+    protected interface ListProcessor<LT> {
+        List<LT> process( List<LT> list, BiPredicate<LT, LT> matcher );
     }
 }

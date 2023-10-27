@@ -1,6 +1,7 @@
 package org.litesoft.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ class SingleLinkedListTest {
                 continue;
             }
             Integer actual = sll.remove();
-            if ((actual != null) && (0 == actual)) { // terminator
+            if ( (actual != null) && (0 == actual) ) { // terminator
                 break;
             }
             Integer expected = fibs.next();
@@ -110,6 +111,36 @@ class SingleLinkedListTest {
         remove( sll, 13, 21, null );
         assertEquals( sllToString( simpleName ), sll.toString() );
         assertEquals( 0, sll.size() );
+
+        sll.append( 1, 2, 3, 4, 5, null );
+        List<Integer> noEffect = sll.removeAllEqual( Arrays.asList( 1, 2, 3, 5, 6, null ) );
+        assertEquals( 1, noEffect.size(), noEffect.toString() );
+        assertEquals( 6, noEffect.get( 0 ) );
+        assertEquals( 1, sll.size() );
+        assertEquals( 4, sll.remove() );
+
+        Integer iNull = null; // Following numbers should be outside of the cached range
+        Integer i10 = sBoxed( 10 );
+        Integer i11 = sBoxed( 11 );
+        Integer i12 = sBoxed( 12 );
+        Integer i13 = sBoxed( 13 );
+        Integer i14 = sBoxed( 14 );
+        Integer i15 = sBoxed( 15 );
+        int alt11 = sBoxed( 11 );
+        sll.append( i10, i11, i12, i13, iNull, i14, null, i15 ); // i11 != 11
+        noEffect = sll.removeAllIdentity( Arrays.asList( i13, i12, i10, i14, null, i15, alt11 ) );
+        assertEquals( 1, noEffect.size(), noEffect.toString() );
+        assertEquals( 11, unBox( noEffect.get( 0 ) ) ); // alt 11 passed in
+        assertEquals( 1, sll.size() );
+        assertEquals( 11, unBox( sll.remove() ) ); // i11 - no matching identity
+    }
+
+    private int unBox( Integer value ) {
+        return value - Integer.MIN_VALUE;
+    }
+
+    private int sBoxed( int value ) {
+        return Integer.MIN_VALUE + value;
     }
 
     private void remove( SingleLinkedList<Integer> sll, Integer... removed ) {
